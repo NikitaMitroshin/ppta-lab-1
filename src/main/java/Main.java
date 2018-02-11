@@ -16,23 +16,34 @@ import java.util.Set;
 public class Main {
 
     private static final String FILE_EXTENSION = ".txt";
+    private static final String EXIT = "exit";
 
     public static void main(String[] args) {
         try (final Scanner scanner = new Scanner(System.in)) {
-            while (true) {
-                System.out.print("Enter file name (without extension): ");
-                final String input = scanner.nextLine();
-                if (input == null || input.isEmpty()) {
-                    System.out.println("invalid file name");
-                    continue;
-                }
-                final Grammar grammar = fromFile(new File(input + FILE_EXTENSION));
-                System.out.println(getType(grammar).getType());
-                break;
-            }
+            readFromConsole(scanner);
         }
     }
 
+    private static void readFromConsole(Scanner scanner) {
+            System.out.println("Enter file name (without extension) or 'exit' to exit: ");
+            final String input = scanner.nextLine();
+            if (input == null || input.isEmpty()) {
+                System.out.println("invalid file name");
+                readFromConsole(scanner);
+            }
+            if (EXIT.equals(input)) {
+                return;
+            }
+            try {
+                final Grammar grammar = fromFile(new File(input + FILE_EXTENSION));
+                System.out.println(getType(grammar).getType());
+            } catch (IllegalArgumentException e) {
+                System.out.println("invalid file name");
+                readFromConsole(scanner);
+            }
+            readFromConsole(scanner);
+
+    }
 
     private static Grammar fromFile(File file) throws IllegalArgumentException {
         try {
@@ -61,7 +72,6 @@ public class Main {
     }
 
     // проверяем что нет ни одной строки где слева было бы больше символов чем справа
-    //
     private static boolean isType1(Grammar grammar) {
         return grammar.getRules()
                 .stream()
@@ -70,12 +80,13 @@ public class Main {
                         .length());
     }
 
+    // у КС левая часть должна состоять только из одного нетерминала
     private static boolean isType2(Grammar grammar) {
         return grammar.getRules()
                 .stream()
-                .noneMatch(rule -> {
-                    List<Character> leftChars = StringUtil.splitToChars(rule.getLeft());
-                    return (leftChars.size() > 1) && (grammar.getT().contains(leftChars.get(0)));
+                .allMatch(rule -> {
+                    final List<Character> leftChars = StringUtil.splitToChars(rule.getLeft());
+                    return leftChars.size() == 1 && !grammar.getT().contains(leftChars.get(0));
                 });
     }
 
