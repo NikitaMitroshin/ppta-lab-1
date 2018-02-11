@@ -1,0 +1,4 @@
+R->R~T⊥|R^T⊥|ε
+T->F|Fi|Fj|Gk|ε
+G->GkG
+K->Ki|Km|m

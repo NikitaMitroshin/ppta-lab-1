@@ -1,0 +1,10 @@
+S->aSBC
+S->aBC
+CB->CZ
+CZ->WZ
+WZ->WC
+WC->BC
+aB->ab
+bB->bb
+bC->bc
+cC->cc
